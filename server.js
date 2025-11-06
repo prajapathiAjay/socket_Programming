@@ -1,13 +1,28 @@
 import express from "express"
+import { Server } from "socket.io";
+import http from "http";
+
+const app = express();
+
+//1. creating http server (we need to create http server to integrate socket.io with express because socket.io works with http server)
+const server = http.createServer(app);
+
+// 2. creating socket.io server
+const io = new Server(server, { cors: { origin: "*", methods: ["GET", "POST"] } });
+
+// 3. using socket event to establish connection
 
 
-const server=express();
+io.on("connection", (socket) => {
+    console.log(`User connected: ${socket.id}`);
+    socket.on("disconnect", () => {
+        console.log(`User disconnected: ${socket.id}`);
+    })
 
-const PORT=3000;
-
-server.get("/",(req,res)=>{
-    res.send("Hello from Express server");
 })
-server.listen(PORT,()=>{
-    console.log(`Server is running on http://localhost:${PORT}`);
+
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 })
