@@ -29,6 +29,7 @@
     <script>
       // this is socket.io js code
       // get elements
+       const socket = io.connect('http://localhost:3000');
       const messageList = document.querySelector("#messages");
       const messageInput = document.querySelector(".message-input");
       const sendButton = document.querySelector(".send-button");
@@ -36,14 +37,23 @@
       sendButton.addEventListener("click", function () {
         // read message and send to the server
         const message = messageInput.value;
-        socket.emit("chat message", message);
+        socket.emit("new_message", message);
         const messageElement = document.createElement("div");
         messageElement.innerText = message;
         messages.appendChild(messageElement);
         messageInput.value = "";
       });
 
-      const socket = io.connect("http://localhost:3000");
+
+
+      // listen to the broadcast message and add it to the list
+      socket.on("broadcast_message",(message)=>{
+        const messageElement = document.createElement("div");
+        messageElement.innerText = message;
+        messages.appendChild(messageElement);
+      })
+
+      // const socket = io.connect("http://localhost:3000");
     </script>
   </body>
 </html>
