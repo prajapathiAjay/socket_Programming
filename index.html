@@ -1,18 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chatt application</title>
-</head>
-<body>
-    <script src="http://localhost:3000/socket.io/socket.io.js">
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="chat-container">
+      <div class="chat-header">💬 Real-Time Chat</div>
 
-    </script>
+      <div id="messages">
+        <!-- <div class="message incoming">Hello there 👋</div>
+        <div class="message outgoing">Hey! How are you?</div> -->
+      </div>
+
+      <div class="chat-input-area">
+        <input
+          class="message-input"
+          type="text"
+          placeholder="Type your message..."
+        />
+        <button class="send-button">Send</button>
+      </div>
+    </div>
+
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
     <script>
-        // this is socket.io js code
-     const socket = io.connect('http://localhost:3000');
+      // this is socket.io js code
+      // get elements
+      const messageList = document.querySelector("#messages");
+      const messageInput = document.querySelector(".message-input");
+      const sendButton = document.querySelector(".send-button");
 
+      sendButton.addEventListener("click", function () {
+        // read message and send to the server
+        const message = messageInput.value;
+        socket.emit("chat message", message);
+        const messageElement = document.createElement("div");
+        messageElement.innerText = message;
+        messages.appendChild(messageElement);
+        messageInput.value = "";
+      });
+
+      const socket = io.connect("http://localhost:3000");
     </script>
-</body>
+  </body>
 </html>
