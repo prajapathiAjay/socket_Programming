@@ -1,0 +1,33 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+
+# Build or temp files
+dist/
+build/
+tmp/
+temp/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Editor and IDE settings
+.vscode/
+.idea/
+
+# Coverage or debug output (optional)
+coverage/
+.nyc_output/
+
+# PM2 / process manager files
+pids/
+*.pid
+*.seed
+dump.rdb
