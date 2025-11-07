@@ -30,6 +30,8 @@
       // this is socket.io js code
       // get elements
        const socket = io.connect('http://localhost:3000');
+       const userName=prompt("Enter your name to join:");
+       socket.emit("join",userName);
       const messageList = document.querySelector("#messages");
       const messageInput = document.querySelector(".message-input");
       const sendButton = document.querySelector(".send-button");
@@ -39,17 +41,16 @@
         const message = messageInput.value;
         socket.emit("new_message", message);
         const messageElement = document.createElement("div");
-        messageElement.innerText = message;
+        messageElement.innerText =userName + ": " + message;
         messages.appendChild(messageElement);
         messageInput.value = "";
       });
 
 
-
       // listen to the broadcast message and add it to the list
-      socket.on("broadcast_message",(message)=>{
+      socket.on("broadcast_message",(userMessage)=>{
         const messageElement = document.createElement("div");
-        messageElement.innerText = message;
+        messageElement.innerText =userMessage.userName+":"+ userMessage.message;
         messages.appendChild(messageElement);
       })
 

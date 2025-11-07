@@ -15,11 +15,19 @@ const io = new Server(server, { cors: { origin: "*", methods: ["GET", "POST"] } 
 
 io.on("connection", (socket) => {
     console.log(`User connected:`);
+    socket.on("join",(data)=>{
+        socket.userName=data
+    })
 // listening for message from client
 socket.on("new_message",(message)=>{
     console.log(`Message received: ${message}`);
+
+    let userMessage={
+        userName:socket.userName,
+        message:message
+    }
     // broadcasting message to all other clients except sender
-    socket.broadcast.emit("broadcast_message",message)
+    socket.broadcast.emit("broadcast_message",userMessage)
 
 })
 
