@@ -23,11 +23,11 @@ io.on("connection", (socket) => {
   socket.on("join", ({ roomId, userName }) => {
     socket.roomId = roomId;
     socket.userName = userName;
-  
+
     socket.join(roomId);
 
-      socket.emit("joinSuccess",{userName})
-console.log(`${userName} joined room: ${roomId}`);  
+    socket.emit("joinSuccess", { userName })
+    console.log(`${userName} joined room: ${roomId}`);
     // Notify other users in the room
     socket.to(roomId).emit("userJoined", { userName });
   });
@@ -36,7 +36,7 @@ console.log(`${userName} joined room: ${roomId}`);
   socket.on("sendMessage", ({ message }) => {
     const roomId = socket.roomId;
     const userName = socket.userName;
-   console.log()
+    console.log()
     // Broadcast to everyone in the same room
     io.to(roomId).emit("message", { userName, message });
   });
