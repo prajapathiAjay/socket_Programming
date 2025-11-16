@@ -1,44 +1,49 @@
-import express from "express"
-import { Server } from "socket.io";
+
+import express from "express";
 import http from "http";
+import { Server } from "socket.io";
+import cors from "cors";
 
-const app = express();
+export const app = express();
+app.use(cors());
 
-//1. creating http server (we need to create http server to integrate socket.io with express because socket.io works with http server)
 const server = http.createServer(app);
 
-// 2. creating socket.io server
-const io = new Server(server, { cors: { origin: "*", methods: ["GET", "POST"] } });
-
-// 3. using socket event to establish connection
-
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 
 io.on("connection", (socket) => {
-    console.log(`User connected:`);
-    socket.on("join",(data)=>{
-        socket.userName=data
-    })
-// listening for message from client
-socket.on("new_message",(message)=>{
-    console.log(`Message received: ${message}`);
+  console.log("Connection made.");
 
-    let userMessage={
-        userName:socket.userName,
-        message:message
-    }
-    // broadcasting message to all other clients except sender
-    socket.broadcast.emit("broadcast_message",userMessage)
+  // User joins a specific room
+  socket.on("join", ({ roomId, userName }) => {
+    socket.roomId = roomId;
+    socket.userName = userName;
+  
+    socket.join(roomId);
 
-})
+      socket.emit("joinSuccess",{userName})
+console.log(`${userName} joined room: ${roomId}`);  
+    // Notify other users in the room
+    socket.to(roomId).emit("userJoined", { userName });
+  });
 
-    socket.on("disconnect", () => {
-        console.log(`User disconnected: ${socket.id}`);
-    })
+  // User sends message
+  socket.on("sendMessage", ({ message }) => {
+    const roomId = socket.roomId;
+    const userName = socket.userName;
+   console.log()
+    // Broadcast to everyone in the same room
+    io.to(roomId).emit("message", { userName, message });
+  });
 
-})
+  socket.on("disconnect", () => {
+    console.log("Connection disconnected.");
+  });
+});
 
-const PORT = process.env.PORT || 3000;
-
-server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-})
+server.listen(3000, () => console.log("Server running on port 3000"));

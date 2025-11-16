@@ -1,60 +1,110 @@
-<!DOCTYPE html>
+<!-- 
+
+ <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chatt application</title>
-    <link rel="stylesheet" href="style.css" />
+    <title>Chat-Room App</title>
+    <link rel="stylesheet" href="styles.css" />
   </head>
+
   <body>
-    <div class="chat-container">
-      <div class="chat-header">💬 Real-Time Chat</div>
-
-      <div id="messages">
-        <!-- <div class="message incoming">Hello there 👋</div>
-        <div class="message outgoing">Hey! How are you?</div> -->
-      </div>
-
-      <div class="chat-input-area">
+    <!-- Login Section -->
+    <div id="login-container">
+      <form id="login-form">
         <input
-          class="message-input"
           type="text"
-          placeholder="Type your message..."
+          id="username-input"
+          placeholder="Enter your username"
+          required
         />
-        <button class="send-button">Send</button>
-      </div>
+        <input
+          type="text"
+          id="room-input"
+          placeholder="Enter room ID"
+          required
+        />
+        <button id="start-chatting" type="submit">Start Chatting</button>
+      </form>
+    </div>
+
+    <!-- Chat Section -->
+    <div id="chat-container" style="display: none">
+      <div id="message-display"></div>
+
+      <form id="message-form">
+        <input
+          type="text"
+          id="message-input"
+          placeholder="Type your message"
+          required
+        />
+        <button type="submit">Send</button>
+      </form>
     </div>
 
     <script src="http://localhost:3000/socket.io/socket.io.js"></script>
     <script>
-      // this is socket.io js code
-      // get elements
-       const socket = io.connect('http://localhost:3000');
-       const userName=prompt("Enter your name to join:");
-       socket.emit("join",userName);
-      const messageList = document.querySelector("#messages");
-      const messageInput = document.querySelector(".message-input");
-      const sendButton = document.querySelector(".send-button");
+      const socket = io("http://localhost:3000");
 
-      sendButton.addEventListener("click", function () {
-        // read message and send to the server
-        const message = messageInput.value;
-        socket.emit("new_message", message);
-        const messageElement = document.createElement("div");
-        messageElement.innerText =userName + ": " + message;
-        messages.appendChild(messageElement);
-        messageInput.value = "";
+      // Selectors
+      const loginForm = document.querySelector("#login-form");
+      const userNameInput = document.querySelector("#username-input");
+      const roomInput = document.querySelector("#room-input");
+      const chatContainer = document.querySelector("#chat-container");
+      const loginContainer = document.querySelector("#login-container");
+      const messageForm = document.querySelector("#message-form");
+      const messageInput = document.querySelector("#message-input");
+      const messageDisplay = document.querySelector("#message-display");
+
+      let userName = "";
+      let roomId = "";
+
+      // ------------------ User Login & Join Room ------------------
+      loginForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        userName = userNameInput.value.trim();
+        roomId = roomInput.value.trim();
+
+        if (userName && roomId) {
+          socket.emit("join", { userName, roomId });
+          loginContainer.style.display = "none";
+          chatContainer.style.display = "block";
+
+          appendMessage(`Welcome ${userName}! You joined room: ${roomId}`, "system");
+        }
       });
 
+      // ------------------ Send Message ------------------
+      messageForm.addEventListener("submit", (e) => {
+        e.preventDefault();
 
-      // listen to the broadcast message and add it to the list
-      socket.on("broadcast_message",(userMessage)=>{
-        const messageElement = document.createElement("div");
-        messageElement.innerText =userMessage.userName+":"+ userMessage.message;
-        messages.appendChild(messageElement);
-      })
+        const message = messageInput.value.trim();
+        if (message) {
+          socket.emit("sendMessage", { message });
+          appendMessage(`You: ${message}`, "self");
+          messageInput.value = "";
+        }
+      });
 
-      // const socket = io.connect("http://localhost:3000");
+      // ------------------ Receive Events ------------------
+      socket.on("userJoined", ({ userName }) => {
+        appendMessage(`${userName} has joined the room.`, "system");
+      });
+
+      socket.on("message", ({ userName, message }) => {
+        appendMessage(`${userName}: ${message}`, "other");
+      });
+
+      // ------------------ Helper to Display Messages ------------------
+      function appendMessage(text, type) {
+        const msg = document.createElement("div");
+        msg.classList.add("message", type);
+        msg.innerText = text;
+        messageDisplay.appendChild(msg);
+        messageDisplay.scrollTop = messageDisplay.scrollHeight;
+      }
     </script>
   </body>
-</html>
+</html> -->
